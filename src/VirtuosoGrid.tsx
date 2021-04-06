@@ -106,6 +106,7 @@ const VirtuosoGridFC: React.FC<VirtuosoGridFCProps> = ({
       className={className}
       scrollTo={scrollTo}
       scrollTop={scrollTop}
+      reset={engine.reset}
     >
       <div ref={viewportCallbackRef} style={viewportStyle} className={containerClassName}>
         {React.createElement(

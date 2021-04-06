@@ -46,6 +46,11 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
   const scrollToIndex$ = coldSubject<TScrollLocation>()
   const rangeChanged$ = coldSubject<ListRange>()
   const endThreshold$ = subject(0)
+  const currentEndIndex$ = subject<number | null>(null)
+
+  function reset() {
+    currentEndIndex$.next(null)
+  }
 
   combineLatest(gridDimensions$, scrollTop$, overscan$, totalCount$)
     .pipe(withLatestFrom(itemRange$))
@@ -128,20 +133,21 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
   const isScrolling$ = buildIsScrolling(scrollTop$)
 
   const endReached$ = coldSubject<number>()
-  let currentEndIndex = 0
 
-  itemRange$.pipe(withLatestFrom(totalCount$, endThreshold$)).subscribe(([[_, endIndex], totalCount, endThreshold]) => {
-    if (totalCount === 0) {
-      return
-    }
-
-    if (endIndex >= totalCount - endThreshold) {
-      if (currentEndIndex !== endIndex) {
-        currentEndIndex = endIndex
-        endReached$.next(endIndex)
+  itemRange$
+    .pipe(withLatestFrom(totalCount$, endThreshold$, currentEndIndex$))
+    .subscribe(([[_, endIndex], totalCount, endThreshold, currentEndIndex]) => {
+      if (totalCount === 0) {
+        return
       }
-    }
-  })
+
+      if (endIndex >= totalCount - endThreshold) {
+        if (currentEndIndex !== endIndex) {
+          currentEndIndex$.next(endIndex)
+          endReached$.next(endIndex)
+        }
+      }
+    })
 
   const { isSeeking$, scrollSeekConfiguration$ } = scrollSeekEngine({
     scrollTop$,
@@ -223,5 +229,7 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
     isScrolling: makeOutput(isScrolling$),
     endReached: makeOutput(endReached$),
     rangeChanged: makeOutput(rangeChanged$),
+
+    reset,
   }
 }
