@@ -76,12 +76,7 @@ export const VirtuosoScroller: FC<{
   ScrollContainer?: TScrollContainer
   scrollTop: (scrollTop: number) => void
   scrollTo: (callback: (scrollTop: ScrollToOptions) => void) => void
-  reset?: () => void
-}> = ({ children, style, className, ScrollContainer = DefaultScrollContainer, scrollTop, scrollTo, reset }, ref) => {
-  React.useImperativeHandle(ref, () => ({
-    reset,
-  }))
-
+}> = ({ children, style, className, ScrollContainer = DefaultScrollContainer, scrollTop, scrollTo }) => {
   return (
     <ScrollContainer
       style={{ ...scrollerStyle, ...style }}
