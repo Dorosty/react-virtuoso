@@ -34,7 +34,7 @@ const calculateItemsPerRow = (viewportWidth: number, itemWidth: number) => hackF
 
 const toRowIndex = (index: number, itemsPerRow: number, roundFunc = floor) => roundFunc(index / itemsPerRow)
 
-export const VirtuosoGridEngine = (initialItemCount = 0) => {
+export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } = {}) => {
   const itemsRender = subject<any>(false)
   const gridDimensions$ = subject<GridDimensions>([0, 0, undefined, undefined, undefined, undefined])
   const totalCount$ = subject(0)
@@ -50,6 +50,16 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
 
   function reset() {
     currentEndIndex$.next(null)
+  }
+
+  if (autoReset) {
+    let lastTotalCount = -Infinity
+    totalCount$.subscribe(totalCount => {
+      if (totalCount < lastTotalCount) {
+        reset()
+      }
+      lastTotalCount = totalCount
+    })
   }
 
   combineLatest(gridDimensions$, scrollTop$, overscan$, totalCount$)
