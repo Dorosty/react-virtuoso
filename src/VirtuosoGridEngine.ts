@@ -239,7 +239,5 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
     isScrolling: makeOutput(isScrolling$),
     endReached: makeOutput(endReached$),
     rangeChanged: makeOutput(rangeChanged$),
-
-    reset,
   }
 }
