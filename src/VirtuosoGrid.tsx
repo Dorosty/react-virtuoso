@@ -58,10 +58,6 @@ export class VirtuosoGrid extends React.PureComponent<VirtuosoGridProps, Virtuos
     this.state.scrollToIndex(location)
   }
 
-  public reset() {
-    this.state.reset()
-  }
-
   public render() {
     return <VirtuosoGridFC {...this.props} engine={this.state} />
   }
