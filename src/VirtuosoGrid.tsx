@@ -28,6 +28,7 @@ export interface VirtuosoGridProps {
   scrollSeek?: ScrollSeekConfiguration
   endThreshold?: number
   viewportElement: HTMLElement
+  autoReset?: boolean
 }
 
 type VirtuosoGridState = ReturnType<typeof VirtuosoGridEngine>
@@ -35,7 +36,12 @@ type VirtuosoGridState = ReturnType<typeof VirtuosoGridEngine>
 type VirtuosoGridFCProps = Omit<VirtuosoGridProps, 'overscan'> & { engine: VirtuosoGridState }
 
 export class VirtuosoGrid extends React.PureComponent<VirtuosoGridProps, VirtuosoGridState> {
-  public state = VirtuosoGridEngine(this.props.initialItemCount)
+  constructor(props: VirtuosoGridProps) {
+    super(props)
+
+    const { initialItemCount, autoReset } = props
+    this.state = VirtuosoGridEngine({ initialItemCount, autoReset })
+  }
 
   public static getDerivedStateFromProps(props: VirtuosoGridProps, engine: VirtuosoGridState) {
     engine.overscan(props.overscan || 0)

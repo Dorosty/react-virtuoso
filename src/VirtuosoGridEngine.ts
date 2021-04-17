@@ -34,7 +34,7 @@ const calculateItemsPerRow = (viewportWidth: number, itemWidth: number) => hackF
 
 const toRowIndex = (index: number, itemsPerRow: number, roundFunc = floor) => roundFunc(index / itemsPerRow)
 
-export const VirtuosoGridEngine = (initialItemCount = 0) => {
+export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } = {}) => {
   const itemsRender = subject<any>(false)
   const gridDimensions$ = subject<GridDimensions>([0, 0, undefined, undefined, undefined, undefined])
   const totalCount$ = subject(0)
@@ -46,6 +46,21 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
   const scrollToIndex$ = coldSubject<TScrollLocation>()
   const rangeChanged$ = coldSubject<ListRange>()
   const endThreshold$ = subject(0)
+  const currentEndIndex$ = subject<number | null>(null)
+
+  function reset() {
+    currentEndIndex$.next(null)
+  }
+
+  if (autoReset) {
+    let lastTotalCount = -Infinity
+    totalCount$.subscribe(totalCount => {
+      if (totalCount < lastTotalCount) {
+        reset()
+      }
+      lastTotalCount = totalCount
+    })
+  }
 
   combineLatest(gridDimensions$, scrollTop$, overscan$, totalCount$)
     .pipe(withLatestFrom(itemRange$))
@@ -128,20 +143,21 @@ export const VirtuosoGridEngine = (initialItemCount = 0) => {
   const isScrolling$ = buildIsScrolling(scrollTop$)
 
   const endReached$ = coldSubject<number>()
-  let currentEndIndex = 0
 
-  itemRange$.pipe(withLatestFrom(totalCount$, endThreshold$)).subscribe(([[_, endIndex], totalCount, endThreshold]) => {
-    if (totalCount === 0) {
-      return
-    }
-
-    if (endIndex >= totalCount - endThreshold) {
-      if (currentEndIndex !== endIndex) {
-        currentEndIndex = endIndex
-        endReached$.next(endIndex)
+  itemRange$
+    .pipe(withLatestFrom(totalCount$, endThreshold$, currentEndIndex$))
+    .subscribe(([[_, endIndex], totalCount, endThreshold, currentEndIndex]) => {
+      if (totalCount === 0) {
+        return
       }
-    }
-  })
+
+      if (endIndex >= totalCount - endThreshold) {
+        if (currentEndIndex !== endIndex) {
+          currentEndIndex$.next(endIndex)
+          endReached$.next(endIndex)
+        }
+      }
+    })
 
   const { isSeeking$, scrollSeekConfiguration$ } = scrollSeekEngine({
     scrollTop$,
