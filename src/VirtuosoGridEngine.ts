@@ -47,6 +47,7 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
   const rangeChanged$ = coldSubject<ListRange>()
   const endThreshold$ = subject(0)
   const currentEndIndex$ = subject<number | null>(null)
+  const contentKey$ = subject<number | null>(null)
 
   function reset() {
     currentEndIndex$.next(null)
@@ -59,6 +60,14 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
         reset()
       }
       lastTotalCount = totalCount
+    })
+
+    let lastContentKey: number | null = null
+    contentKey$.subscribe(contentKey => {
+      if (contentKey != lastContentKey) {
+        reset()
+      }
+      lastContentKey = contentKey
     })
   }
 
@@ -230,6 +239,7 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
     scrollToIndex: makeInput(scrollToIndex$),
     scrollSeekConfiguration: makeInput(scrollSeekConfiguration$),
     endThreshold: makeInput(endThreshold$),
+    contentKey: makeInput(contentKey$),
 
     itemsRender: makeOutput(itemsRender),
     itemRange: makeOutput(itemRange$),

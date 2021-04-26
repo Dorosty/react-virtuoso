@@ -29,6 +29,7 @@ export interface VirtuosoGridProps {
   endThreshold?: number
   viewportElement: HTMLElement
   autoReset?: boolean
+  contentKey?: number
 }
 
 type VirtuosoGridState = ReturnType<typeof VirtuosoGridEngine>
@@ -51,6 +52,7 @@ export class VirtuosoGrid extends React.PureComponent<VirtuosoGridProps, Virtuos
     engine.rangeChanged(props.rangeChanged)
     engine.scrollSeekConfiguration(props.scrollSeek)
     engine.endThreshold(props.endThreshold || 1)
+    engine.contentKey(props.contentKey || null)
     return null
   }
 
