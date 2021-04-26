@@ -64,7 +64,7 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
 
     let lastContentKey: number | null = null
     contentKey$.subscribe(contentKey => {
-      if (contentKey != lastContentKey) {
+      if (contentKey !== lastContentKey) {
         reset()
       }
       lastContentKey = contentKey
