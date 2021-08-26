@@ -108,7 +108,7 @@ export const VirtuosoGridEngine = ({ initialItemCount = 0, autoReset = false } =
         const listBottom = itemHeight * toRowIndex(endIndex, itemsPerRow) + itemHeight
 
         // totalCount has decreased, we have to re-render
-        if (totalCount < endIndex - 1) {
+        if (endIndex < totalCount - 1) {
           updateRange(true)
           // user is scrolling up - list top is below the top edge of the viewport
         } else if (listTop > scrollTop) {
